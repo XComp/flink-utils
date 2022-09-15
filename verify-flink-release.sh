@@ -131,31 +131,36 @@ rm -rf ${working_dir}/dist.apache.org
 mkdir -p $source_directory
 tar -xzf ${working_dir}/${flink_git_tag}/*src.tgz --directory ${source_directory}
 cd ${source_directory}/flink*
-$maven_exec -T1C -DskipTests -pl flink-dist -am package
+$maven_exec -T1C -DskipTests -pl flink-dist -am package 2>&1 | tee ${working_dir}/source-build.out
 cd -
 
+gpg_checksum_file=${working_dir}/gpg.out
+sha_checksum_file=${working_dir}/sha.out
 for f in $(find ${flink_git_tag} \( -path ${source_directory#"${working_dir}/"} -prune -or -not -name "*sha512" -and -not -name "*asc" \) -and -type f); do
   sha512_checksum_of_file="$(sha512sum $f | grep -o "^[^ ]*")"
   downloaded_sha512_checksum="$(cat $f.sha512 | grep -o "^[^ ]*")"
 
   echo "$f"
+  echo "$f" >> ${gpg_checksum_file}
+  echo "$f" >> ${sha_checksum_file}
   if [[ "${sha512_checksum_of_file}" == "${downloaded_sha512_checksum}" ]]; then
-    echo -e "   <SHA512> [\e[32mCORRECT\e[0m]"
+    echo -e "   <SHA512> [\e[32mCORRECT\e[0m]" | tee -a ${sha_checksum_file}
   else
-    echo -e "   <SHA512> [\e[31mERROR\e[0m]"
-    echo    "   $f.sha512 does not match the checksum of $f"
+    echo -e "   <SHA512> [\e[31mERROR\e[0m]" | tee -a ${sha_checksum_file}
+    echo    "   $f.sha512 does not match the checksum of $f" | tee -a ${sha_checksum_file}
     exit 1
   fi
 
   if $(gpg --verify $f.asc $f &> /dev/null); then
-    echo -e "   <GPG>    [\e[32mCORRECT\e[0m]"
+    echo -e "   <GPG>    [\e[32mCORRECT\e[0m]" | tee -a ${gpg_checksum_file}
   else
-    echo -e "   <GPG>    [\e[31mERROR\e[0m]"
-    echo    "   $f.asc does not match the GPG key $f is certified with"
+    echo -e "   <GPG>    [\e[31mERROR\e[0m]" | tee -a ${gpg_checksum_file}
+    echo    "   $f.asc does not match the GPG key $f is certified with" | tee -a ${gpg_checksum_file}
     exit 1
   fi
 done
 
 # TODO: We should filter the parent pom to remove the Apache projects version from the output
-echo "Checking the version with the pom files (no version should show up except for the Apache version):"
-find ${source_directory} -name pom.xml -not -path "*target*" -exec sh -c "grep -A3 '<parent>' {} | grep version | sed 's/.*<version>\([^<]*\)<\/version>.*/\1/g'" \; | grep -v $flink_version | sort | uniq -c
+pom_version_check_file=${working_dir}/pom-version-check.out
+echo "Checking the version with the pom files (no version should show up except for the Apache version):" | tee -a ${pom_version_check_file}
+find ${source_directory} -name pom.xml -not -path "*target*" -exec sh -c "grep -A3 '<parent>' {} | grep version | sed 's/.*<version>\([^<]*\)<\/version>.*/\1/g'" \; | grep -v $flink_version | sort | uniq -c | tee -a ${pom_version_check_file}
