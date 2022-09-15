@@ -36,6 +36,7 @@ print_info_and_exit() {
   echo "$0 verifies Flink releases. The following steps are executed:"
   echo "  - Download all resources"
   echo "  - Extracts sources and runs build"
+  echo "  - Compares git tag checkout with downloaded sources"
   echo "  - Verifies SHA512 checksums"
   echo "  - Verifies GPG certifaction"
   echo "  - Checks that all POMs have the right expected version"
@@ -97,6 +98,7 @@ flink_git_tag="$(echo $url | grep -o '[^/]*$' | sed 's/flink-\(.*\)$/\1/g')"
 flink_version="$(echo $flink_git_tag | sed 's/\(.*\)-rc[0-9]\+/\1/g')"
 download_dir="${working_dir}/flink-${flink_git_tag}"
 source_directory="$download_dir/src"
+checkout_directory="$download_dir/checkout"
 
 # validate variables
 if ! which $maven_exec &> /dev/null; then
@@ -123,9 +125,18 @@ wget --recursive --no-parent --directory-prefix ${working_dir} --reject "*.html,
 mv ${working_dir}/dist.apache.org/repos/dist/dev/flink/flink* ${working_dir}
 rm -rf ${working_dir}/dist.apache.org
 
+# clone git tag
+git clone --depth 1 --branch release-${flink_git_tag} git@github.com:apache/flink.git ${checkout_directory} 2>&1 | tee ${working_dir}/git-clone.out
+
+# extracts downloaded sources
 mkdir -p $source_directory
 tar -xzf ${download_dir}/*src.tgz --directory ${source_directory}
-cd ${source_directory}/flink*
+
+# compare downloaded sources with sources from git
+comm -3 <(find ${checkout_directory} -type f | sed "s~${checkout_directory}/~~g" | sort) <(find ${source_directory}/flink-${flink_version}/ -type f | sed "s~${source_directory}/flink-${flink_version}/~~g" | sort) | tee ${working_dir}/diff-download-clone.out
+
+# run Maven build on downloaded sources
+cd ${source_directory}/flink-${flink_version}
 $maven_exec -T1C -DskipTests -pl flink-dist -am package 2>&1 | tee ${working_dir}/source-build.out
 cd -
 
