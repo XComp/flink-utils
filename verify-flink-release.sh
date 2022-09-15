@@ -97,11 +97,12 @@ elif [[ -z "${public_gpg_key+x}" ]]; then
 fi
 
 # derive variables
-flink_git_tag="$(echo $url | grep -o '[^/]*$')"
+flink_git_tag="$(echo $url | grep -o '[^/]*$' | sed 's/flink-\(.*\)$/\1/g')"
 flink_version="$(echo $flink_git_tag | sed 's/\(.*\)-rc[0-9]\+/\1/g')"
+download_dir="${working_dir}/flink-${flink_git_tag}"
 if [[ -z "${source_directory+x}" ]]; then
   # derive source directory if it isn't specified
-  source_directory="$working_dir/$flink_git_tag/src"
+  source_directory="$download_dir/src"
 fi
 
 # validate variables
@@ -125,11 +126,12 @@ fi
 
 # download and extract sources
 wget --recursive --no-parent --directory-prefix ${working_dir} --reject "*.html,*.tmp,*.txt" "${url}/"
+# this will place the artifacts in ${download_dir}
 mv ${working_dir}/dist.apache.org/repos/dist/dev/flink/flink* ${working_dir}
 rm -rf ${working_dir}/dist.apache.org
 
 mkdir -p $source_directory
-tar -xzf ${working_dir}/${flink_git_tag}/*src.tgz --directory ${source_directory}
+tar -xzf ${download_dir}/*src.tgz --directory ${source_directory}
 cd ${source_directory}/flink*
 $maven_exec -T1C -DskipTests -pl flink-dist -am package 2>&1 | tee ${working_dir}/source-build.out
 cd -
