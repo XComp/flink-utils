@@ -96,8 +96,8 @@ function compare_downloaded_source_with_repo_checkout() {
   source_directory=$3
 
   comm -3 \
-    <(find ${checkout_directory} -type f | sed "s~${checkout_directory}/~~g" | sort) \
-    <(find ${source_directory} -type f | sed "s~${source_directory}/~~g" | sort) \
+    <(find ${checkout_directory} -type f | sed "s|${checkout_directory}/||g" | sort) \
+    <(find ${source_directory} -type f | sed "s|${source_directory}/||g" | sort) \
       | tee ${working_directory}/diff-download-clone.out
 }
 
