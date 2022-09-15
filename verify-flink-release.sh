@@ -110,13 +110,14 @@ elif ! grep --quiet "Apache Maven 3.2.5" <($maven_exec --version); then
   exit 1
 fi
 
-echo "GPG verification happens for:"
-gpg --list-keys ${public_gpg_key}
+gpg_checksum_file=${working_dir}/gpg.out
+echo "GPG verification happens for:" | tee ${gpg_checksum_file}
+gpg --list-keys ${public_gpg_key} | tee -a ${gpg_checksum_file}
 
 if [[ "$(gpg --list-keys | grep -c $public_gpg_key)" == "0" ]]; then
   gpg_key_server="pgpkeys.mit.edu"
-  echo "The key $public_gpg_key wasn't found in the local registry. Trying to load it from $gpg_key_server."
-  gpg --keyserver $gpg_key_server --recv-key ${public_gpg_key}
+  echo "The key $public_gpg_key wasn't found in the local registry. Trying to load it from $gpg_key_server." | tee -a ${gpg_checksum_file}
+  gpg --keyserver $gpg_key_server --recv-key ${public_gpg_key} | tee -a ${gpg_checksum_file}
 fi
 
 # download and extract sources
@@ -125,24 +126,8 @@ wget --recursive --no-parent --directory-prefix ${working_dir} --reject "*.html,
 mv ${working_dir}/dist.apache.org/repos/dist/dev/flink/flink* ${working_dir}
 rm -rf ${working_dir}/dist.apache.org
 
-# clone git tag
-git clone --depth 1 --branch release-${flink_git_tag} git@github.com:apache/flink.git ${checkout_directory} 2>&1 | tee ${working_dir}/git-clone.out
-
-# extracts downloaded sources
-mkdir -p $source_directory
-tar -xzf ${download_dir}/*src.tgz --directory ${source_directory}
-
-# compare downloaded sources with sources from git
-comm -3 <(find ${checkout_directory} -type f | sed "s~${checkout_directory}/~~g" | sort) <(find ${source_directory}/flink-${flink_version}/ -type f | sed "s~${source_directory}/flink-${flink_version}/~~g" | sort) | tee ${working_dir}/diff-download-clone.out
-
-# run Maven build on downloaded sources
-cd ${source_directory}/flink-${flink_version}
-$maven_exec -T1C -DskipTests -pl flink-dist -am package 2>&1 | tee ${working_dir}/source-build.out
-cd -
-
-gpg_checksum_file=${working_dir}/gpg.out
 sha_checksum_file=${working_dir}/sha.out
-for f in $(find ${download_dir} \( -path ${source_directory#"${working_dir}/"} -prune -or -not -name "*sha512" -and -not -name "*asc" \) -and -type f); do
+for f in $(find ${download_dir} -not -name "*sha512" -and -not -name "*asc" -and -type f); do
   sha512_checksum_of_file="$(sha512sum $f | grep -o "^[^ ]*")"
   downloaded_sha512_checksum="$(cat $f.sha512 | grep -o "^[^ ]*")"
 
@@ -165,6 +150,24 @@ for f in $(find ${download_dir} \( -path ${source_directory#"${working_dir}/"} -
     exit 1
   fi
 done
+
+# clone git tag
+git clone --depth 1 --branch release-${flink_git_tag} git@github.com:apache/flink.git ${checkout_directory} 2>&1 | tee ${working_dir}/git-clone.out
+
+# extracts downloaded sources
+mkdir -p $source_directory
+tar -xzf ${download_dir}/*src.tgz --directory ${source_directory}
+# remove this extra layer in the directory structure
+mv ${source_directory}/flink-${flink_version}/{*,.[^.]*} ${source_directory} 
+rm -d ${source_directory}/flink-${flink_version}
+
+# compare downloaded sources with sources from git
+comm -3 <(find ${checkout_directory} -type f | sed "s~${checkout_directory}/~~g" | sort) <(find ${source_directory} -type f | sed "s~${source_directory}/~~g" | sort) | tee ${working_dir}/diff-download-clone.out
+
+# run Maven build on downloaded sources
+cd ${source_directory}
+$maven_exec -T1C -DskipTests -pl flink-dist -am package 2>&1 | tee ${working_dir}/source-build.out
+cd -
 
 # TODO: We should filter the parent pom to remove the Apache projects version from the output
 pom_version_check_file=${working_dir}/pom-version-check.out
