@@ -109,21 +109,21 @@ checkout_directory="${working_dir}/checkout"
 download_dir_name="downloaded_artifacts"
 download_dir=${working_dir}/${download_dir_name}
 
-check_maven_version $maven_exec
+check_maven_version $maven_exec || exit 1
 
-download_artifacts ${working_dir} ${url} ${download_dir_name}
+download_artifacts ${working_dir} ${url} ${download_dir_name} || exit 1
 
-clone_repo ${working_dir} ${flink_git_tag} ${checkout_directory}
+clone_repo ${working_dir} ${flink_git_tag} ${checkout_directory} || exit 1
 
-extract_source_artifacts ${working_dir} ${download_dir} ${source_directory} ${flink_version}
+extract_source_artifacts ${working_dir} ${download_dir} ${source_directory} ${flink_version} || exit 1
 
-check_gpg ${working_dir} ${public_gpg_key} ${download_dir}
-check_sha512 ${working_dir} ${download_dir}
-compare_downloaded_source_with_repo_checkout ${working_dir} ${checkout_directory} ${source_directory}
-check_version_in_poms ${working_dir} ${source_directory} ${flink_version}
+check_gpg ${working_dir} ${public_gpg_key} ${download_dir} || exit 1
+check_sha512 ${working_dir} ${download_dir} || exit 1
+compare_downloaded_source_with_repo_checkout ${working_dir} ${checkout_directory} ${source_directory} || exit 1
+check_version_in_poms ${working_dir} ${source_directory} ${flink_version} || exit 1
 
-build_flink ${working_dir} ${source_directory} ${maven_exec}
+build_flink ${working_dir} ${source_directory} ${maven_exec} || exit 1
 
 source_bin=${source_directory}/build-target
-run_flink_session_cluster ${source_bin} examples/streaming/WordCount.jar ${working_dir}/session-wordcount-streaming.tgz
-run_flink_session_cluster ${source_bin} examples/batch/WordCount.jar ${working_dir}/session-wordcount-batch.tgz
+run_flink_session_cluster ${source_bin} examples/streaming/WordCount.jar ${working_dir}/session-wordcount-streaming.tgz || exit 1
+run_flink_session_cluster ${source_bin} examples/batch/WordCount.jar ${working_dir}/session-wordcount-batch.tgz || exit 1
