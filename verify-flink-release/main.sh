@@ -23,6 +23,7 @@ set -e
 source subtasks/download_artifacts.sh
 source subtasks/checks.sh
 source subtasks/maven_build.sh
+source subtasks/flink_test_run.sh
 
 # defaults
 maven_exec="mvn"
@@ -122,3 +123,7 @@ compare_downloaded_source_with_repo_checkout ${working_dir} ${checkout_directory
 check_version_in_poms ${working_dir} ${source_directory} ${flink_version}
 
 build_flink ${working_dir} ${source_directory} ${maven_exec}
+
+source_bin=${source_directory}/build-target
+run_flink_session_cluster ${source_bin} examples/streaming/WordCount.jar ${working_dir}/session-wordcount-streaming.tgz
+run_flink_session_cluster ${source_bin} examples/batch/WordCount.jar ${working_dir}/session-wordcount-batch.tgz
