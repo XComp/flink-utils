@@ -22,7 +22,7 @@ maven_exec="mvn"
 working_dir="$(pwd)"
 
 print_usage() {
-  echo "Usage: $0 [-h] [-d] -u <url> -g <gpg-public-key-ref> [-m <maven-exec>] [-w <working-directory>] [-s <source-directory>]"
+  echo "Usage: $0 [-h] [-d] -u <url> -g <gpg-public-key-ref> [-m <maven-exec>] [-w <working-directory>]"
   echo ""
   echo "  -h            Prints information about this script."
   echo "  -d            Enables debug logging."
@@ -30,7 +30,6 @@ print_usage() {
   echo "  -g            GPG public key reference that was used for signing the artifacts."
   echo "  -m            Maven executable being used. Only Maven 3.2.5 is supported for now. (default: $maven_exec)"
   echo "  -w            Working directory used for downloading and processing the artifacts. The directory needs to exist beforehand. (default: $working_dir)"
-  echo "  -s            Source directory is the folder where the source are extracted to. (default: <working-directory>/<flink-version-tag>/src)"
 }
 
 print_info_and_exit() {
@@ -80,9 +79,6 @@ while getopts "hdm:u:g:w:s:" o; do
         print_error_with_usage_and_exit "Passed working directory ${working_dir} doesn't exist."
       fi
       ;;
-    s)
-      source_directory=${OPTARG}
-      ;;
     *)
       print_error_with_usage_and_exit "Invalid parameter passed: ${o}"
       ;;
@@ -100,10 +96,7 @@ fi
 flink_git_tag="$(echo $url | grep -o '[^/]*$' | sed 's/flink-\(.*\)$/\1/g')"
 flink_version="$(echo $flink_git_tag | sed 's/\(.*\)-rc[0-9]\+/\1/g')"
 download_dir="${working_dir}/flink-${flink_git_tag}"
-if [[ -z "${source_directory+x}" ]]; then
-  # derive source directory if it isn't specified
-  source_directory="$download_dir/src"
-fi
+source_directory="$download_dir/src"
 
 # validate variables
 if ! which $maven_exec &> /dev/null; then
