@@ -124,7 +124,7 @@ if [[ "$(gpg --list-keys | grep -c $public_gpg_key)" == "0" ]]; then
 fi
 
 # download and extract sources
-wget --recursive --no-parent --reject "*.html,*.tmp,*.txt" "${url}/"
+wget --recursive --no-parent --directory-prefix ${working_dir} --reject "*.html,*.tmp,*.txt" "${url}/"
 mv ${working_dir}/dist.apache.org/repos/dist/dev/flink/flink* ${working_dir}
 rm -rf ${working_dir}/dist.apache.org
 
