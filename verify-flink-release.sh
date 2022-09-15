@@ -17,6 +17,8 @@
 #  limitations under the License.
 ################################################################################
 
+set -e
+
 # defaults
 maven_exec="mvn"
 working_dir="$(pwd)"
