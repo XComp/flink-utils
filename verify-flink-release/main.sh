@@ -30,12 +30,13 @@ maven_exec="mvn"
 working_dir="$(pwd)"
 
 print_usage() {
-  echo "Usage: $0 [-h] [-d] -u <url> -g <gpg-public-key-ref> [-m <maven-exec>] [-w <working-directory>]"
+  echo "Usage: $0 [-h] [-d] -u <url> -g <gpg-public-key-ref> -b <base-git-tag> [-m <maven-exec>] [-w <working-directory>]"
   echo ""
   echo "  -h            Prints information about this script."
   echo "  -d            Enables debug logging."
   echo "  -u            URL that's used for downloaded the artifacts."
   echo "  -g            GPG public key reference that was used for signing the artifacts."
+  echo "  -b            Base git tag to compare to."
   echo "  -m            Maven executable being used. Only Maven 3.2.5 is supported for now. (default: $maven_exec)"
   echo "  -w            Working directory used for downloading and processing the artifacts. The directory needs to exist beforehand. (default: $working_dir)"
 }
@@ -48,6 +49,7 @@ print_info_and_exit() {
   echo "  - Verifies SHA512 checksums"
   echo "  - Verifies GPG certifaction"
   echo "  - Checks that all POMs have the right expected version"
+  echo "  - Generate diffs to compare pom file changes with NOTICE files"
   echo ""
   echo "See usage info below for further details on how to use the script..."
   print_usage
@@ -64,7 +66,7 @@ if [[ "$#" == 0 ]]; then
   print_info_and_exit
 fi
 
-while getopts "hdm:u:g:w:s:" o; do
+while getopts "hdm:u:g:w:b:s:" o; do
   case "${o}" in
     d)
       set -x
@@ -78,6 +80,9 @@ while getopts "hdm:u:g:w:s:" o; do
       ;;
     g)
       public_gpg_key=${OPTARG}
+      ;;
+    b)
+      base_git_tag=${OPTARG}
       ;;
     m)
       maven_exec=${OPTARG}
@@ -99,6 +104,8 @@ if [[ -z "${url+x}"  ]]; then
   print_error_with_usage_and_exit "Missing URL"
 elif [[ -z "${public_gpg_key+x}" ]]; then
   print_error_with_usage_and_exit "Missing GPG public key reference"
+elif [[ -z "${base_git_tag+x}" ]]; then
+  print_error_with_usage_and_exit "Missing base git tag"
 fi
 
 # derive variables
@@ -113,7 +120,7 @@ check_maven_version $maven_exec || exit 1
 
 download_artifacts ${working_dir} ${url} ${download_dir_name} || exit 1
 
-clone_repo ${working_dir} ${flink_git_tag} ${checkout_directory} || exit 1
+clone_repo ${working_dir} ${flink_git_tag} ${checkout_directory} ${base_git_tag} || exit 1
 
 extract_source_artifacts ${working_dir} ${download_dir} ${source_directory} ${flink_version} || exit 1
 
@@ -121,6 +128,7 @@ check_gpg ${working_dir} ${public_gpg_key} ${download_dir} || exit 1
 check_sha512 ${working_dir} ${download_dir} || exit 1
 compare_downloaded_source_with_repo_checkout ${working_dir} ${checkout_directory} ${source_directory} || exit 1
 check_version_in_poms ${working_dir} ${source_directory} ${flink_version} || exit 1
+compare_notice_with_pom_changes ${working_dir} ${checkout_directory} ${flink_git_tag} ${base_git_tag} || exit 1
 
 build_flink ${working_dir} ${source_directory} ${maven_exec} || exit 1
 

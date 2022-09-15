@@ -123,3 +123,23 @@ function check_version_in_poms() {
       sort | \
       uniq -c | tee -a ${pom_version_check_file}
 }
+
+function compare_notice_with_pom_changes() {
+  echo "### compare_notice_with_pom_changes $@"
+  local working_directory checkout_directory flink_git_tag base_git_tag
+
+  if [[ "$#" != 4 ]]; then
+    echo "Usage: <working-directory> <checkout-directory> <flink-git-tag> <base-git-tag>"
+    return 1
+  fi
+
+  working_directory=$1
+  checkout_directory=$2
+  flink_git_tag=$3
+  base_git_tag=$4
+
+  cd ${checkout_directory}
+  git --no-pager log release-${base_git_tag}..release-${flink_git_tag}~1 -p -- **/pom.xml > ${working_directory}/pom-diff.out
+  git --no-pager log release-${base_git_tag}..release-${flink_git_tag}~1 -p -- **/NOTICE > ${working_directory}/notice-diff.out
+  cd -
+}

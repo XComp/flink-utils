@@ -38,18 +38,23 @@ function download_artifacts() {
 
 function clone_repo() {
   echo "### clone_repo $@"
-  local working_directory flink_git_tag checkout_directory
+  local working_directory flink_git_tag checkout_directory base_git_tag
 
-  if [[ "$#" != 3 ]]; then
-    echo "Usage: <working-directory> <flink-git-tag> <checkout-directory>"
+  if [[ "$#" != 4 ]]; then
+    echo "Usage: <working-directory> <flink-git-tag> <checkout-directory> <base-git-tag>"
     return 1
   fi
 
   working_directory=$1
   flink_git_tag=$2
   checkout_directory=$3
+  base_git_tag=$4
 
-  git clone --depth 1 --branch release-${flink_git_tag} git@github.com:apache/flink.git ${checkout_directory} 2>&1 | tee ${working_directory}/git-clone.out
+  local out_file
+  out_file=${working_directory}/git-clone.out
+  git clone --branch release-${flink_git_tag} git@github.com:apache/flink.git ${checkout_directory} 2>&1 | tee ${out_file}
+  cd ${checkout_directory}
+  git fetch origin release-${base_git_tag} 2>&1 | tee -a ${out_file}
 }
 
 function extract_source_artifacts() {
