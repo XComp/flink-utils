@@ -18,6 +18,7 @@
 ################################################################################
 
 function check_maven_version() {
+  echo "### check_maven_version $@"
   local maven_exec
 
   if [[ "$#" != "1" ]]; then
@@ -38,6 +39,7 @@ function check_maven_version() {
 }
 
 function build_flink() {
+  echo "### build_flink $@"
   local working_directory source_directory maven_exec
 
   if [[ "$#" != 3 ]]; then

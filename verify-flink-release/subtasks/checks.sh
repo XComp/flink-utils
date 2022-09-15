@@ -18,6 +18,7 @@
 ################################################################################
 
 function check_gpg() {
+  echo "### check_gpg $@"
   local working_directory public_gpg_key download_directory gpg_key_server gpg_checksum_file
 
   if [[ "$#" != 3 ]] && [[ "$#" != 4 ]]; then
@@ -53,6 +54,7 @@ function check_gpg() {
 }
 
 function check_sha512() {
+  echo "### check_sha512 $@"
   local working_directory download_directory sha_checksum_file sha512_checksum_of_file downloaded_sha512_checksum
 
   if [[ "$#" != 2 ]]; then
@@ -81,6 +83,7 @@ function check_sha512() {
 }
 
 function compare_downloaded_source_with_repo_checkout() {
+  echo "### compare_downloaded_source_with_repo_checkout $@"
   local working_directory checkout_directory source_directory
 
   if [[ "$#" != 3 ]]; then
@@ -99,6 +102,7 @@ function compare_downloaded_source_with_repo_checkout() {
 }
 
 function check_version_in_poms() {
+  echo "### check_version_in_poms $@"
   local working_directory source_directory flink_version
 
   if [[ "$#" != 3 ]]; then

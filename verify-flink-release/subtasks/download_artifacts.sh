@@ -18,6 +18,7 @@
 ################################################################################
 
 function download_artifacts() {
+  echo "### download_artifacts $@"
   local working_directory url download_dir_name
 
   if [[ "$#" != 3 ]]; then
@@ -36,6 +37,7 @@ function download_artifacts() {
 }
 
 function clone_repo() {
+  echo "### clone_repo $@"
   local working_directory flink_git_tag checkout_directory
 
   if [[ "$#" != 3 ]]; then
@@ -51,6 +53,7 @@ function clone_repo() {
 }
 
 function extract_source_artifacts() {
+  echo "### extract_source_artifacts $@"
   local working_directory download_directory source_directory flink_version
   
   if [[ "$#" != 4 ]]; then

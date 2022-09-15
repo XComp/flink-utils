@@ -18,6 +18,7 @@
 ################################################################################
 
 function run_flink_session_cluster() {
+  echo "### run_flink_session_cluster $@"
   local binary_folder job_jar_relative_path log_archive
 
   if [[ "$#" != "3" ]]; then
