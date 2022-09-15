@@ -131,7 +131,7 @@ cd -
 
 gpg_checksum_file=${working_dir}/gpg.out
 sha_checksum_file=${working_dir}/sha.out
-for f in $(find ${flink_git_tag} \( -path ${source_directory#"${working_dir}/"} -prune -or -not -name "*sha512" -and -not -name "*asc" \) -and -type f); do
+for f in $(find ${download_dir} \( -path ${source_directory#"${working_dir}/"} -prune -or -not -name "*sha512" -and -not -name "*asc" \) -and -type f); do
   sha512_checksum_of_file="$(sha512sum $f | grep -o "^[^ ]*")"
   downloaded_sha512_checksum="$(cat $f.sha512 | grep -o "^[^ ]*")"
 
