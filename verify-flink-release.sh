@@ -131,7 +131,7 @@ rm -rf ${working_dir}/dist.apache.org
 mkdir -p $source_directory
 tar -xzf ${working_dir}/${flink_git_tag}/*src.tgz --directory ${source_directory}
 cd ${source_directory}/flink*
-$maven_exec -DskipTests -pl flink-dist -am package
+$maven_exec -T1C -DskipTests -pl flink-dist -am package
 cd -
 
 for f in $(find ${flink_git_tag} \( -path ${source_directory#"${working_dir}/"} -prune -or -not -name "*sha512" -and -not -name "*asc" \) -and -type f); do
