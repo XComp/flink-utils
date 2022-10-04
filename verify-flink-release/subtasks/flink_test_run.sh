@@ -19,16 +19,17 @@
 
 function run_flink_session_cluster() {
   echo "### run_flink_session_cluster $@"
-  local binary_folder job_jar_relative_path log_archive
+  local working_directory label binary_folder job_jar_relative_path
 
-  if [[ "$#" != "3" ]]; then
-    echo "Usage: <binary-folder> <relative-path-to-job-jar> <logs-archive-path>"
+  if [[ "$#" != "4" ]]; then
+    echo "Usage: <working-directory> <label> <binary-folder> <relative-path-to-job-jar>"
     return 1
   fi
  
-  binary_folder=$1
-  job_jar_relative_path=$2
-  log_archive=$3
+  working_directory=$1
+  label=$2
+  binary_folder=$3
+  job_jar_relative_path=$4
 
   if [[ ! -d ${binary_folder} ]]; then
     echo "Error: ${binary_folder} is not a directory."
@@ -39,6 +40,8 @@ function run_flink_session_cluster() {
   ${binary_folder}/bin/flink run ${binary_folder}/${job_jar_relative_path}
   ${binary_folder}/bin/stop-cluster.sh
 
-  tar -czf ${log_archive} -C ${binary_folder} log
-  rm -f ${binary_folder}/log/*
+  mv ${binary_folder}/log ${binary_folder}/log-${label} 
+  tar -czf ${working_directory}/${label}.tgz -C ${binary_folder} log-${label}
+  rm -rf ${binary_folder}/log-${label}
+  mkdir ${binary_folder}/log
 }
