@@ -140,3 +140,14 @@ build_flink ${working_dir} ${source_directory} ${maven_exec} || exit 1
 source_bin=${source_directory}/build-target
 run_flink_session_cluster ${source_bin} examples/streaming/WordCount.jar ${working_dir}/session-wordcount-streaming.tgz || exit 1
 run_flink_session_cluster ${source_bin} examples/batch/WordCount.jar ${working_dir}/session-wordcount-batch.tgz || exit 1
+
+echo "==== Mailing list response ===="
+echo "+1 (non-binding)"
+echo ""
+echo "* Downloaded artifacts"
+echo "* Verified checksums/GPG signatures"
+echo "* Compared checkout with provided sources"
+echo "* Verified pom file versions"
+echo "* Went over NOTICE file/pom files changes without finding anything suspicious"
+echo "* Build Flink from sources"
+echo "* Deployed standalone session cluster and ran WordCount example in batch and streaming: Nothing suspicious in log files found"
