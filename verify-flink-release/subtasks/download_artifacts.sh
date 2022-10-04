@@ -30,10 +30,15 @@ function download_artifacts() {
   url=$2
   download_dir_name=$3
 
-  wget --recursive --no-parent --directory-prefix ${working_directory} --reject "*.html,*.tmp,*.txt" "${url}/"
+  local out_file
+  out_file="${working_directory}/download-artifacts.out"
+  wget --recursive --no-parent --directory-prefix ${working_directory} --reject "*.html,*.tmp,*.txt" "${url}/" 2>&1 | tee ${out_file}
   mv ${working_directory}/dist.apache.org/repos/dist/dev/flink/flink* ${working_directory}
   rm -rf ${working_directory}/dist.apache.org
   mv ${working_directory}/{flink*,${download_dir_name}}
+  
+  echo "Downloaded artifacts: $(find ${working_directory}/${download_dir_name} -type f | wc -l)" | tee -a ${out_file}
+  find ${working_directory}/${download_dir_name} | tee -a ${out_file}
 }
 
 function clone_repo() {
