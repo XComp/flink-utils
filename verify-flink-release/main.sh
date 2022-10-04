@@ -18,6 +18,8 @@
 ################################################################################
 
 set -o errexit
+set -o nounset
+set -o pipefail
 
 # source: https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
 script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
