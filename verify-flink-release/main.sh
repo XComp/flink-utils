@@ -138,8 +138,8 @@ compare_notice_with_pom_changes ${working_dir} ${checkout_directory} ${flink_git
 build_flink ${working_dir} ${source_directory} ${maven_exec} || exit 1
 
 source_bin=${source_directory}/build-target
-run_flink_session_cluster ${source_bin} examples/streaming/WordCount.jar ${working_dir}/session-wordcount-streaming.tgz || exit 1
-run_flink_session_cluster ${source_bin} examples/batch/WordCount.jar ${working_dir}/session-wordcount-batch.tgz || exit 1
+run_flink_session_cluster ${working_dir} session-wordcount-streaming ${source_bin} examples/streaming/WordCount.jar
+run_flink_session_cluster ${working_dir} session-wordcount-batch ${source_bin} examples/batch/WordCount.jar
 
 echo "==== Mailing list response ===="
 echo "+1 (non-binding)"
