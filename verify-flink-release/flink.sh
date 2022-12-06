@@ -122,21 +122,21 @@ checkout_directory="${working_dir}/checkout"
 download_dir_name="downloaded_artifacts"
 download_dir=${working_dir}/${download_dir_name}
 
-check_maven_version $maven_exec || exit 1
+check_maven_version $maven_exec
 
-download_artifacts ${working_dir} ${url} ${download_dir_name} || exit 1
+download_artifacts ${working_dir} ${url} ${download_dir_name}
 
-clone_repo ${working_dir} ${flink_git_tag} ${checkout_directory} ${base_git_tag} || exit 1
+clone_repo ${working_dir} ${flink_git_tag} ${checkout_directory} ${base_git_tag}
 
-extract_source_artifacts ${working_dir} ${download_dir} ${source_directory} ${flink_version} || exit 1
+extract_source_artifacts ${working_dir} ${download_dir} ${source_directory} ${flink_version}
 
-check_gpg ${working_dir} ${public_gpg_key} ${download_dir} || exit 1
-check_sha512 ${working_dir} ${download_dir} || exit 1
-compare_downloaded_source_with_repo_checkout ${working_dir} ${checkout_directory} ${source_directory} || exit 1
-check_version_in_poms ${working_dir} ${source_directory} ${flink_version} || exit 1
-compare_notice_with_pom_changes ${working_dir} ${checkout_directory} ${flink_git_tag} ${base_git_tag} || exit 1
+check_gpg ${working_dir} ${public_gpg_key} ${download_dir}
+check_sha512 ${working_dir} ${download_dir}
+compare_downloaded_source_with_repo_checkout ${working_dir} ${checkout_directory} ${source_directory}
+check_version_in_poms ${working_dir} ${source_directory} ${flink_version}
+compare_notice_with_pom_changes ${working_dir} ${checkout_directory} ${flink_git_tag} ${base_git_tag}
 
-build_flink ${working_dir} ${source_directory} ${maven_exec} || exit 1
+build_flink ${working_dir} ${source_directory} ${maven_exec}
 
 source_bin=${source_directory}/build-target
 run_flink_session_cluster ${working_dir} session-wordcount-streaming ${source_bin} examples/streaming/WordCount.jar
