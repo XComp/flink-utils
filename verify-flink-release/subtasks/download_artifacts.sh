@@ -43,21 +43,22 @@ function download_artifacts() {
 
 function clone_repo() {
   echo "### clone_repo $@"
-  local working_directory new_release_git_tag checkout_directory base_git_tag
+  local working_directory repository new_release_git_tag checkout_directory base_git_tag
 
-  if [[ "$#" != 4 ]]; then
-    echo "Usage: <working-directory> <new-release-git-tag-flink-version> <checkout-directory> <base-git-tag-flink-version>"
+  if [[ "$#" != 5 ]]; then
+    echo "Usage: <working-directory> <repository> <new-release-git-tag-flink-version> <checkout-directory> <base-git-tag-flink-version>"
     return 1
   fi
 
   working_directory=$1
-  new_release_git_tag=release-$2
-  checkout_directory=$3
-  base_git_tag=release-$4
+  repository=$2
+  new_release_git_tag=release-$3
+  checkout_directory=$4
+  base_git_tag=release-$5
 
   local out_file
   out_file=${working_directory}/git-clone.out
-  git clone --branch ${new_release_git_tag} git@github.com:apache/flink.git ${checkout_directory} 2>&1 | tee ${out_file}
+  git clone --branch ${new_release_git_tag} git@github.com:apache/${repository}.git ${checkout_directory} 2>&1 | tee ${out_file}
   cd ${checkout_directory}
   git fetch origin ${base_git_tag} 2>&1 | tee -a ${out_file}
 }

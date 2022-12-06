@@ -137,7 +137,7 @@ check_maven_version $maven_exec
 
 download_artifacts ${working_dir} ${url} ${download_dir_name}
 
-clone_repo ${working_dir} ${flink_git_tag} ${checkout_directory} ${base_git_tag}
+clone_repo ${working_dir} "flink" ${flink_git_tag} ${checkout_directory} ${base_git_tag}
 
 extract_source_artifacts ${working_dir} ${download_dir} ${source_directory} ${flink_version}
 
