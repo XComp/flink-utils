@@ -40,16 +40,23 @@ function check_maven_version() {
 
 function build_flink() {
   echo "### build_flink $@"
-  local working_directory source_directory maven_exec
+  local working_directory source_directory maven_exec target_modules
 
-  if [[ "$#" != 3 ]]; then
-    echo "Usage: <working-directory> <source_directory> <maven_exec>"
+  if [[ "$#" < 4 ]]; then
+    echo "Usage: <working-directory> <source_directory> <maven_exec> <target_modules>"
     return 1
   fi
 
   working_directory=$1
   source_directory=$2
   maven_exec=$3
+  target_modules=( "${@[@]:4}" )
 
-  $maven_exec -f ${source_directory}/pom.xml -T1C -DskipTests -pl flink-dist -am package 2>&1 | tee ${working_directory}/source-build.out
+  local target_modules_str
+  for module in $target_modules; do
+    # a leading , (comma) doesn't harm the Maven execution
+    target_modules_str="$target_modules_str,$module"
+  done
+
+  $maven_exec -f ${source_directory}/pom.xml -T1C -DskipTests -pl ${target_modules_str} -am package 2>&1 | tee ${working_directory}/source-build.out
 }
