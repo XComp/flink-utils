@@ -149,7 +149,7 @@ compare_notice_with_pom_changes ${working_dir} ${checkout_directory} ${flink_git
 
 use_default_maven_params=""
 target_maven_modules="flink-dist"
-build_flink ${working_dir} ${source_directory} ${maven_exec} "${use_default_maven_params}" "${target_maven_modules}"
+build_sources ${working_dir} ${source_directory} ${maven_exec} "${use_default_maven_params}" "${target_maven_modules}"
 
 source_bin=${source_directory}/build-target
 run_flink_session_cluster ${working_dir} session-wordcount-streaming ${source_bin} examples/streaming/WordCount.jar

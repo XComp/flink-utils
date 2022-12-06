@@ -38,8 +38,8 @@ function check_maven_version() {
   fi 
 }
 
-function build_flink() {
-  echo "### build_flink $@"
+function build_sources() {
+  echo "### build_sources $@"
   local working_directory source_directory maven_exec maven_params target_modules
 
   if [[ "$#" < 5 ]]; then
