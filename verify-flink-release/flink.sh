@@ -147,7 +147,9 @@ compare_downloaded_source_with_repo_checkout ${working_dir} ${checkout_directory
 check_version_in_poms ${working_dir} ${source_directory} ${flink_version}
 compare_notice_with_pom_changes ${working_dir} ${checkout_directory} ${flink_git_tag} ${base_git_tag}
 
-build_flink ${working_dir} ${source_directory} ${maven_exec} "flink-dist"
+use_default_maven_params=""
+target_maven_modules="flink-dist"
+build_flink ${working_dir} ${source_directory} ${maven_exec} "${use_default_maven_params}" "${target_maven_modules}"
 
 source_bin=${source_directory}/build-target
 run_flink_session_cluster ${working_dir} session-wordcount-streaming ${source_bin} examples/streaming/WordCount.jar

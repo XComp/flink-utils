@@ -40,17 +40,18 @@ function check_maven_version() {
 
 function build_flink() {
   echo "### build_flink $@"
-  local working_directory source_directory maven_exec target_modules
+  local working_directory source_directory maven_exec maven_params target_modules
 
-  if [[ "$#" < 4 ]]; then
-    echo "Usage: <working-directory> <source_directory> <maven_exec> <target_modules>"
+  if [[ "$#" < 5 ]]; then
+    echo "Usage: <working-directory> <source_directory> <maven_exec> <override-additional-params> <target_modules>"
     return 1
   fi
 
   working_directory=$1
   source_directory=$2
   maven_exec=$3
-  target_modules=( "${@[@]:4}" )
+  maven_params=${4:-"-DskipTests"}
+  target_modules=( "${@[@]:5}" )
 
   local target_modules_str
   for module in $target_modules; do
@@ -58,5 +59,5 @@ function build_flink() {
     target_modules_str="$target_modules_str,$module"
   done
 
-  $maven_exec -f ${source_directory}/pom.xml -T1C -DskipTests -pl ${target_modules_str} -am package 2>&1 | tee ${working_directory}/source-build.out
+  $maven_exec -f ${source_directory}/pom.xml -T1C ${maven_params} -pl ${target_modules_str} -am package 2>&1 | tee ${working_directory}/source-build.out
 }
