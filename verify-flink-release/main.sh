@@ -55,6 +55,7 @@ print_info_and_exit() {
   echo "  - Verifies GPG certifaction"
   echo "  - Checks that all POMs have the right expected version"
   echo "  - Generate diffs to compare pom file changes with NOTICE files"
+  echo "  - Runs WordCount example in batch mode and streaming mode to verify the logs"
   echo ""
   echo "See usage info below for further details on how to use the script..."
   print_usage
