@@ -25,6 +25,7 @@ set -o pipefail
 script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # imports
+source ${script_dir}/subtasks/common.sh
 source ${script_dir}/subtasks/download_artifacts.sh
 source ${script_dir}/subtasks/checks.sh
 source ${script_dir}/subtasks/maven_build.sh
@@ -45,6 +46,16 @@ print_usage() {
   echo "  -m            Maven executable being used. Only Maven 3.2.5 is supported for now. (default: $maven_exec)"
   echo "  -w            Working directory used for downloading and processing the artifacts. The directory needs to exist beforehand. (default: $working_dir)"
 }
+
+tasks=(
+  "Downloaded artifacts"
+  "Built Flink from sources"
+  "Verified SHA512 checksums GPG signatures"
+  "Compared checkout with provided sources"
+  "Verified pom file versions"
+  "Went over NOTICE file/pom files changes without finding anything suspicious"
+  "Deployed standalone session cluster and ran WordCount example in batch and streaming: Nothing suspicious in log files found"
+)
 
 print_info_and_exit() {
   echo "$0 verifies Flink releases. The following steps are executed:"
@@ -142,13 +153,4 @@ source_bin=${source_directory}/build-target
 run_flink_session_cluster ${working_dir} session-wordcount-streaming ${source_bin} examples/streaming/WordCount.jar
 run_flink_session_cluster ${working_dir} session-wordcount-batch ${source_bin} examples/batch/WordCount.jar
 
-echo "==== Mailing list response ===="
-echo "+1 (non-binding)"
-echo ""
-echo "* Downloaded artifacts"
-echo "* Verified checksums/GPG signatures"
-echo "* Compared checkout with provided sources"
-echo "* Verified pom file versions"
-echo "* Went over NOTICE file/pom files changes without finding anything suspicious"
-echo "* Build Flink from sources"
-echo "* Deployed standalone session cluster and ran WordCount example in batch and streaming: Nothing suspicious in log files found"
+print_mailing_list_post ${working_dir} ${tasks}
