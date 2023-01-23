@@ -40,7 +40,7 @@ function check_maven_version() {
 
 function build_sources() {
   echo "### build_sources $@"
-  local working_directory source_directory maven_exec maven_params target_modules
+  local working_directory source_directory maven_exec maven_params
 
   if [[ "$#" < 5 ]]; then
     echo "Usage: <working-directory> <source_directory> <maven_exec> <override-additional-params> <target_modules>"
@@ -55,6 +55,7 @@ function build_sources() {
 
   # use left-over parameters as target modules
   local target_modules_str
+  target_modules_str=""
   for module in $@; do
     # a leading , (comma) doesn't harm the Maven execution
     target_modules_str="$target_modules_str,$module"
