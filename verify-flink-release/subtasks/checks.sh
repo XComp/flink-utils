@@ -139,7 +139,7 @@ function compare_notice_with_pom_changes() {
   base_git_tag=release-$4
 
   cd ${checkout_directory}
-  git --no-pager log ${base_git_tag}..${new_release_git_tag}~1 -p -- "**/pom.xml" "pom.xml" > ${working_directory}/pom-diff.out
-  git --no-pager log ${base_git_tag}..${new_release_git_tag}~1 -p -- "**/NOTICE" "NOTICE" > ${working_directory}/notice-diff.out
+  git --no-pager log --color=always ${base_git_tag}..${new_release_git_tag}~1 -p -- "**/pom.xml" "pom.xml" > ${working_directory}/pom-diff.out
+  git --no-pager log --color=always ${base_git_tag}..${new_release_git_tag}~1 -p -- "**/NOTICE" "NOTICE" > ${working_directory}/notice-diff.out
   cd -
 }
