@@ -51,10 +51,11 @@ function build_sources() {
   source_directory=$2
   maven_exec=$3
   maven_params=${4:-"-DskipTests"}
-  target_modules=( "${@[@]:5}" )
+  shift 4
 
+  # use left-over parameters as target modules
   local target_modules_str
-  for module in $target_modules; do
+  for module in $@; do
     # a leading , (comma) doesn't harm the Maven execution
     target_modules_str="$target_modules_str,$module"
   done
