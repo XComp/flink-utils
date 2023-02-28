@@ -155,4 +155,4 @@ source_bin=${source_directory}/build-target
 run_flink_session_cluster ${working_dir} session-wordcount-streaming ${source_bin} examples/streaming/WordCount.jar
 run_flink_session_cluster ${working_dir} session-wordcount-batch ${source_bin} examples/batch/WordCount.jar
 
-print_mailing_list_post ${working_dir} ${tasks}
+print_mailing_list_post ${working_dir} ${tasks[@]}
