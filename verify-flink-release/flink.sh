@@ -63,7 +63,7 @@ print_info_and_exit() {
   echo "  - Extracts sources and runs build"
   echo "  - Compares git tag checkout with downloaded sources"
   echo "  - Verifies SHA512 checksums"
-  echo "  - Verifies GPG certifaction"
+  echo "  - Verifies GPG certification"
   echo "  - Checks that all POMs have the right expected version"
   echo "  - Generate diffs to compare pom file changes with NOTICE files"
   echo "  - Runs WordCount example in batch mode and streaming mode to verify the logs"
