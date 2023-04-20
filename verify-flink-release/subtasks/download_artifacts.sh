@@ -82,7 +82,13 @@ function extract_source_artifacts() {
   # extracts downloaded sources
   mkdir -p $source_directory
   tar -xzf ${download_directory}/*src.tgz --directory ${source_directory}
+
   # remove this extra layer in the directory structure
-  mv ${source_directory}/${repository_name}-${version}/{*,.[^.]*} ${source_directory}
+  mv ${source_directory}/${repository_name}-${version}/* ${source_directory}
+  # try to move hidden files as well
+  if [[ $(ls ${source_directory}/${repository_name}-${version}/.[^.]* | wc -l) != 0 ]]; then
+    mv ${source_directory}/${repository_name}-${version}/.[^.]* ${source_directory}
+  fi
+
   rm -d ${source_directory}/${repository_name}-${version}
 }
