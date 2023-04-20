@@ -19,23 +19,24 @@
 
 function download_artifacts() {
   echo "### download_artifacts $@"
-  local working_directory url download_dir_name
+  local working_directory url download_dir_name repository_name
 
-  if [[ "$#" != 3 ]]; then
-    echo "Usage: <working-directory> <url> <download-dir-name>"
+  if [[ "$#" != 4 ]]; then
+    echo "Usage: <working-directory> <url> <download-dir-name> <repository_name>"
     return 1
   fi
 
   working_directory=$1
   url=$2
   download_dir_name=$3
+  repository_name=$4
 
   local out_file
   out_file="${working_directory}/download-artifacts.out"
   wget --recursive --no-parent --directory-prefix ${working_directory} --reject "*.html,*.tmp,*.txt" "${url}/" 2>&1 | tee ${out_file}
-  mv ${working_directory}/dist.apache.org/repos/dist/dev/flink/flink* ${working_directory}
+  mv ${working_directory}/dist.apache.org/repos/dist/dev/flink/${repository_name}* ${working_directory}
   rm -rf ${working_directory}/dist.apache.org
-  mv ${working_directory}/{flink*,${download_dir_name}}
+  mv ${working_directory}/{${repository_name}*,${download_dir_name}}
   
   echo "Downloaded artifacts: $(find ${working_directory}/${download_dir_name} -type f | wc -l)" | tee -a ${out_file}
   find ${working_directory}/${download_dir_name} | tee -a ${out_file}
@@ -65,22 +66,23 @@ function clone_repo() {
 
 function extract_source_artifacts() {
   echo "### extract_source_artifacts $@"
-  local working_directory download_directory source_directory flink_version
+  local working_directory download_directory source_directory repository_name version
   
-  if [[ "$#" != 4 ]]; then
-    echo "Usage: <working-directory> <download-directory> <source-directory> <flink-version>"
+  if [[ "$#" != 5 ]]; then
+    echo "Usage: <working-directory> <download-directory> <source-directory> <repository-name> <version>"
     return 1
   fi
 
   working_directory=$1
   download_directory=$2
   source_directory=$3
-  flink_version=$4
+  repository_name=$4
+  version=$5
 
   # extracts downloaded sources
   mkdir -p $source_directory
   tar -xzf ${download_directory}/*src.tgz --directory ${source_directory}
   # remove this extra layer in the directory structure
-  mv ${source_directory}/flink-${flink_version}/{*,.[^.]*} ${source_directory}
-  rm -d ${source_directory}/flink-${flink_version}
+  mv ${source_directory}/${repository_name}-${version}/{*,.[^.]*} ${source_directory}
+  rm -d ${source_directory}/${repository_name}-${version}
 }

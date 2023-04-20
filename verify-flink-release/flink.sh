@@ -125,8 +125,10 @@ elif [[ -z "${base_git_tag+x}" ]]; then
   print_error_with_usage_and_exit "Missing base git tag"
 fi
 
+repository_name="flink"
+
 # derive variables
-flink_git_tag="$(echo $url | grep -o '[^/]*$' | sed 's/flink-\(.*\)$/\1/g')"
+flink_git_tag="$(echo $url | grep -o '[^/]*$' | sed 's/'${repository_name}'-\(.*\)$/\1/g')"
 flink_version="$(echo $flink_git_tag | sed 's/\(.*\)-rc[0-9]\+/\1/g')"
 source_directory="${working_dir}/src"
 checkout_directory="${working_dir}/checkout"
@@ -135,11 +137,11 @@ download_dir=${working_dir}/${download_dir_name}
 
 check_maven_version $maven_exec
 
-download_artifacts ${working_dir} ${url} ${download_dir_name}
+download_artifacts ${working_dir} ${url} ${download_dir_name} ${repository_name}
 
-clone_repo ${working_dir} "flink" ${flink_git_tag} ${checkout_directory} ${base_git_tag}
+clone_repo ${working_dir} ${repository_name} ${flink_git_tag} ${checkout_directory} ${base_git_tag}
 
-extract_source_artifacts ${working_dir} ${download_dir} ${source_directory} ${flink_version}
+extract_source_artifacts ${working_dir} ${download_dir} ${source_directory} ${repository_name} ${flink_version}
 
 check_gpg ${working_dir} ${public_gpg_key} ${download_dir}
 check_sha512 ${working_dir} ${download_dir}
