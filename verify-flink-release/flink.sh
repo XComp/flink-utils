@@ -43,7 +43,7 @@ print_usage() {
   echo "  -u            URL that's used for downloaded the artifacts."
   echo "  -g            GPG public key reference that was used for signing the artifacts."
   echo "  -b            Base git tag to compare to excluding the 'release-' prefix (e.g. '1.15.2' for git tag 'release-1.15.2')."
-  echo "  -m            Maven executable being used. Only Maven 3.2.5 is supported for now. (default: $maven_exec)"
+  echo "  -m            Maven executable being used. Only Maven 3.8.6 is supported for now. (default: $maven_exec)"
   echo "  -w            Working directory used for downloading and processing the artifacts. The directory needs to exist beforehand. (default: $working_dir)"
 }
 

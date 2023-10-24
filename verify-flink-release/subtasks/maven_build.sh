@@ -31,8 +31,8 @@ function check_maven_version() {
   if ! which $maven_exec &> /dev/null; then
     echo "Error: Maven executable '${maven_exec}' not found."
     return 1
-  elif ! grep --quiet "Apache Maven 3.2.5" <($maven_exec --version); then
-    echo "Error: Wrong Maven version used. Only 3.2.5 is supported."
+  elif ! grep --quiet "Apache Maven 3.8.6" <($maven_exec --version); then
+    echo "Error: Wrong Maven version used. Only 3.8.6 is supported."
     $maven_exec --version
     return 1
   fi 
