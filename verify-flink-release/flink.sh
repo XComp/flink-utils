@@ -47,6 +47,7 @@ print_usage() {
   echo "  -w            Working directory used for downloading and processing the artifacts. The directory needs to exist beforehand. (default: $working_dir)"
 }
 
+function_description="Flink releases"
 tasks=(
   "Downloaded artifacts"
   "Built Flink from sources"
@@ -57,22 +58,6 @@ tasks=(
   "Deployed standalone session cluster and ran WordCount example in batch and streaming: Nothing suspicious in log files found"
 )
 
-print_info_and_exit() {
-  echo "$0 verifies Flink releases. The following steps are executed:"
-  echo "  - Download all resources"
-  echo "  - Extracts sources and runs build"
-  echo "  - Compares git tag checkout with downloaded sources"
-  echo "  - Verifies SHA512 checksums"
-  echo "  - Verifies GPG certification"
-  echo "  - Checks that all POMs have the right expected version"
-  echo "  - Generate diffs to compare pom file changes with NOTICE files"
-  echo "  - Runs WordCount example in batch mode and streaming mode to verify the logs"
-  echo ""
-  echo "See usage info below for further details on how to use the script..."
-  print_usage
-  exit 0
-}
-
 print_error_with_usage_and_exit() {
   echo "Error: $1"
   print_usage
@@ -80,7 +65,7 @@ print_error_with_usage_and_exit() {
 }
 
 if [[ "$#" == 0 ]]; then
-  print_info_and_exit
+  print_info_and_exit "$0" "${function_description}" "${tasks[@]}"
 fi
 
 while getopts "hdm:u:g:w:b:s:" o; do
@@ -89,7 +74,7 @@ while getopts "hdm:u:g:w:b:s:" o; do
       set -x
       ;;
     h)
-      print_info_and_exit
+      print_info_and_exit "$0" "${function_description}" "${tasks[@]}"
       ;;
     u)
       # remove any trailing slashes from url
