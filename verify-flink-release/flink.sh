@@ -49,13 +49,13 @@ print_usage() {
 
 function_description="Flink releases"
 tasks=(
-  "Downloaded artifacts"
-  "Built Flink from sources"
-  "Verified SHA512 checksums GPG signatures"
-  "Compared checkout with provided sources"
-  "Verified pom file versions"
-  "Went over NOTICE file/pom files changes without finding anything suspicious"
-  "Deployed standalone session cluster and ran WordCount example in batch and streaming: Nothing suspicious in log files found"
+  "Downloads all artifacts"
+  "Extracts sources and runs compilation on sources"
+  "Diff of git tag checkout with downloaded sources"
+  "Verifies SHA512 checksums & GPG certification"
+  "Checks that all POMs have the right expected version"
+  "Generates diffs to compare pom file changes with NOTICE files"
+  "Verifies WordCount in batch mode and streaming mode with a standalone session cluster to verify the logs"
 )
 
 print_error_with_usage_and_exit() {
