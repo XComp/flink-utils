@@ -61,5 +61,9 @@ function build_sources() {
     target_modules_str="$target_modules_str,$module"
   done
 
-  $maven_exec -f ${source_directory}/pom.xml -T1C ${maven_params} -pl ${target_modules_str} -am package 2>&1 | tee ${working_directory}/source-build.out
+  if [[ "${target_modules_str}" != "" ]]; then
+    target_modules_str="-pl ${target_modules_str} -am"
+  fi
+
+  $maven_exec -f ${source_directory}/pom.xml -T1C ${maven_params} ${target_modules_str} package 2>&1 | tee ${working_directory}/source-build.out
 }
