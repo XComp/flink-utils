@@ -147,6 +147,6 @@ compare_downloaded_source_with_repo_checkout ${working_dir} ${checkout_directory
 check_version_in_poms ${working_dir} ${source_directory} ${version}
 compare_notice_with_pom_changes ${working_dir} ${checkout_directory} ${git_tag} ${base_git_tag}
 
-build_sources ${working_dir} ${source_directory} ${maven_exec}
+build_sources ${working_dir} ${source_directory} ${maven_exec} "" ""
 
 print_mailing_list_post ${working_dir} ${tasks[@]}

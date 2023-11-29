@@ -42,8 +42,8 @@ function build_sources() {
   echo "### build_sources $@"
   local working_directory source_directory maven_exec maven_params
 
-  if [[ "$#" < 5 ]]; then
-    echo "Usage: <working-directory> <source_directory> <maven_exec> <override-additional-params> <target_modules>"
+  if [[ "$#" < 4 ]]; then
+    echo "Usage: <working-directory> <source_directory> <maven_exec> <override-additional-params> [<target_modules> ...]"
     return 1
   fi
 
