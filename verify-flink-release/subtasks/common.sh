@@ -30,7 +30,7 @@ function print_mailing_list_post() {
 
   echo "+1 (non-binding)" | tee ${out_file}
   echo "" | tee -a ${out_file}
-  for task in $@; do
+  for task in "$@"; do
     echo "* ${task}" | tee -a ${out_file}
   done
 }
