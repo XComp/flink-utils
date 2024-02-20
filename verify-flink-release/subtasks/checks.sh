@@ -103,43 +103,43 @@ function compare_downloaded_source_with_repo_checkout() {
 
 function check_version_in_poms() {
   echo "### check_version_in_poms $@"
-  local working_directory source_directory flink_version
+  local working_directory source_directory version
 
   if [[ "$#" != 3 ]]; then
-    echo "Usage: <working-directory> <source_directory> <flink_version>"
+    echo "Usage: <working-directory> <source-directory> <expected-version>"
     return 1
   fi
 
   working_directory=$1
   source_directory=$2
-  flink_version=$3
+  version=$3
   pom_version_check_file=${working_directory}/pom-version-check.out
 
   # TODO: We should filter the parent pom to remove the Apache projects version from the output
   echo "Checking the version with the pom files (no version should show up except for the Apache version):" | tee -a ${pom_version_check_file}
   find ${source_directory} -name pom.xml -not -path "*target*" \
     -exec sh -c "grep -A3 '<parent>' {} | grep version | sed 's/.*<version>\([^<]*\)<\/version>.*/\1/g'" \; | \
-      grep -v $flink_version | \
+      grep -v $version | \
       sort | \
       uniq -c | tee -a ${pom_version_check_file}
 }
 
 function compare_notice_with_pom_changes() {
   echo "### compare_notice_with_pom_changes $@"
-  local working_directory checkout_directory new_release_git_tag base_git_tag
+  local working_directory checkout_directory target_git_tag base_git_tag
 
   if [[ "$#" != 4 ]]; then
-    echo "Usage: <working-directory> <checkout-directory> <new-release-git-tag-flink-version> <base-git-tag-flink-version>"
+    echo "Usage: <working-directory> <checkout-directory> <target-git-tag> <base-git-tag>"
     return 1
   fi
 
   working_directory=$1
   checkout_directory=$2
-  new_release_git_tag=release-$3
-  base_git_tag=release-$4
+  target_git_tag=$3
+  base_git_tag=$4
 
   cd ${checkout_directory}
-  git --no-pager log --color=always ${base_git_tag}..${new_release_git_tag}~1 -p -- "**/pom.xml" "pom.xml" > ${working_directory}/pom-diff.out
-  git --no-pager log --color=always ${base_git_tag}..${new_release_git_tag}~1 -p -- "**/NOTICE" "NOTICE" > ${working_directory}/notice-diff.out
+  git --no-pager log --color=always ${base_git_tag}..${target_git_tag}~1 -p -- "**/pom.xml" "pom.xml" > ${working_directory}/pom-diff.out
+  git --no-pager log --color=always ${base_git_tag}..${target_git_tag}~1 -p -- "**/NOTICE" "NOTICE" > ${working_directory}/notice-diff.out
   cd -
 }
